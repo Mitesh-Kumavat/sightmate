@@ -3,3 +3,6 @@ groq
 dotenv
 uvicorn
 python-multipart
+sqlalchemy
+passlib
+bcrypt
