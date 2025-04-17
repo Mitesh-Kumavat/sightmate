@@ -32,11 +32,6 @@ export default function LandingPage() {
       description: "Get concise audio summaries of today's top news",
       icon: <Newspaper className="h-10 w-10 text-primary" />,
     },
-    // {
-    //   title: "AI Assistant",
-    //   description: "Ask questions and get detailed answers in real-time",
-    //   icon: <HelpCircle className="h-10 w-10 text-primary" />,
-    // },
     {
       title: "Currency Recognition",
       description: "Identify Indian currency notes instantly",
@@ -82,10 +77,11 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen w-auto mx-auto flex flex-col ">
       <Navbar />
 
       {/* Hero Section */}
+
       <section className="relative py-20 md:py-28 px-6">
         <div className="container mx-auto">
           <motion.div
@@ -106,7 +102,7 @@ export default function LandingPage() {
                 <Link href="/dashboard/scene">Try Demo</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/auth/login">Login</Link>
+                <Link href="/login">Login</Link>
               </Button>
             </div>
           </motion.div>
@@ -205,6 +201,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
 
       {/* Footer */}
       <footer className="py-16 px-6 mt-auto">

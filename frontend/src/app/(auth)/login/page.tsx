@@ -47,7 +47,8 @@ export default function LoginPage() {
                 alert("Invalid email or password")
             }
 
-        } catch (error) {
+        } catch (error: any) {
+            alert(error.response.data.detail || "An error occurred during login")
             console.log("ERROR DUIRNG LOGIN", error)
         } finally {
             setIsLoading(false)

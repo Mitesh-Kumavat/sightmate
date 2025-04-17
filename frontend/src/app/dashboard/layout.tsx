@@ -43,6 +43,7 @@ import {
     SidebarSeparator,
     SidebarGroup,
 } from "@/components/ui/sidebar"
+import useAuth from "@/hooks/use-auth"
 
 interface NavItem {
     title: string
@@ -54,9 +55,17 @@ interface NavItem {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname()
     const [isMounted, setIsMounted] = useState(false)
+    const [user, setUser] = useState<string | null>("")
+    const [email, setEmail] = useState<string | null>("")
 
     useEffect(() => {
+        const { user, email } = useAuth();
         setIsMounted(true)
+        if (!user || !email) {
+            window.location.href = "/"
+        }
+        setUser(user)
+        setEmail(email)
     }, [])
 
     const navItems: NavItem[] = [
@@ -105,148 +114,100 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ]
 
     return (
-        <SidebarProvider>
-            <div className="flex min-h-screen">
-                {/* Sidebar for larger screens */}
-                <Sidebar variant="sidebar" collapsible="icon">
-                    <SidebarHeader className="flex flex-col items-center justify-center py-6">
-                        <Link href="/" className="text-2xl font-bold">
-                            SightMate
-                        </Link>
-                    </SidebarHeader>
-                    <SidebarSeparator />
-                    <SidebarContent>
-                        <SidebarGroup>
-                            <SidebarMenu>
-                                {navItems.map((item, index) => (
-                                    <SidebarMenuItem key={index}>
-                                        <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.title}>
-                                            <Link href={item.href}>
-                                                {item.icon}
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroup>
-                    </SidebarContent>
-                    <SidebarFooter>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="w-full justify-start px-2 mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <Avatar className="h-8 w-8">
-                                            <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                                            <AvatarFallback>JD</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex flex-col text-left">
-                                            <span className="text-sm font-medium">John Doe</span>
-                                            <span className="text-xs text-muted-foreground">user@example.com</span>
-                                        </div>
-                                    </div>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56">
-                                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <User className="mr-2 h-4 w-4" />
-                                    <span>Profile</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Logout</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SidebarFooter>
-                </Sidebar>
-
-                {/* Main content area */}
-                <div className="flex-1 flex flex-col">
-                    {/* Header for the dashboard */}
-                    <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                        <div className="flex h-16 items-center px-4 md:px-6">
-                            <SidebarTrigger />
-
-                            {/* Mobile sidebar trigger */}
-                            <Sheet>
-                                <SheetTrigger asChild className="md:hidden ml-2">
-                                    <Button variant="outline" size="icon" className="md:hidden">
-                                        <Menu className="h-5 w-5" />
-                                        <span className="sr-only">Toggle mobile menu</span>
-                                    </Button>
-                                </SheetTrigger>
-                                <SheetContent side="left" className="w-[240px] sm:w-[300px] pr-0">
-                                    <div className="flex flex-col h-full">
-                                        <div className="py-4 flex items-center justify-between px-4">
-                                            <Link href="/" className="text-xl font-bold">
-                                                SightMate
-                                            </Link>
-                                            <SheetTrigger asChild>
-                                                <Button variant="ghost" size="icon">
-                                                    <X className="h-5 w-5" />
-                                                </Button>
-                                            </SheetTrigger>
-                                        </div>
-                                        <nav className="flex-1 px-2 py-4 space-y-2">
-                                            {navItems.map((item, index) => {
-                                                const isActive = pathname === item.href
-                                                return (
-                                                    <Link
-                                                        key={index}
-                                                        href={item.href}
-                                                        className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-                                                            }`}
-                                                    >
-                                                        {item.icon}
-                                                        <div className="flex flex-col">
-                                                            <span>{item.title}</span>
-                                                            <span className="text-xs text-muted-foreground">{item.description}</span>
-                                                        </div>
-                                                    </Link>
-                                                )
-                                            })}
-                                        </nav>
-                                        <div className="border-t p-4 mt-auto">
-                                            <div className="flex items-center gap-2">
-                                                <Avatar className="h-8 w-8">
-                                                    <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
-                                                    <AvatarFallback>JD</AvatarFallback>
-                                                </Avatar>
-                                                <div>
-                                                    <p className="text-sm font-medium">John Doe</p>
-                                                    <p className="text-xs text-muted-foreground">user@example.com</p>
-                                                </div>
+        <div className="flex overflow-hidden h-fit w-full">
+            <SidebarProvider>
+                <div className="flex min-h-screen min-w-full">
+                    <Sidebar variant="sidebar">
+                        <SidebarHeader className="flex min-w-full flex-col items-center justify-center py-3">
+                            <Link href="/" className="text-2xl font-bold">
+                                SightMate
+                            </Link>
+                        </SidebarHeader>
+                        <SidebarSeparator />
+                        <SidebarContent>
+                            <SidebarGroup>
+                                <SidebarMenu>
+                                    {navItems.map((item, index) => (
+                                        <SidebarMenuItem key={index}>
+                                            <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.title}>
+                                                <Link href={item.href}>
+                                                    {item.icon}
+                                                    <span>{item.title}</span>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        </SidebarMenuItem>
+                                    ))}
+                                </SidebarMenu>
+                            </SidebarGroup>
+                        </SidebarContent>
+                        <SidebarFooter>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="w-full justify-start px-2 mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <Avatar className="h-8 w-8">
+                                                <AvatarImage src="/placeholder.svg?height=32&width=32" alt="User" />
+                                                <AvatarFallback>{user && user[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-col text-left">
+                                                <span className="text-sm font-medium">{user}</span>
+                                                <span className="text-xs text-muted-foreground">{email}</span>
                                             </div>
                                         </div>
-                                    </div>
-                                </SheetContent>
-                            </Sheet>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                        <User className="mr-2 h-4 w-4" />
+                                        <span>Profile</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => {
+                                        localStorage.removeItem("user")
+                                        localStorage.removeItem("userId")
+                                        localStorage.removeItem("email")
+                                        window.location.href = "/"
+                                    }}>
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        <span>Logout</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </SidebarFooter>
+                    </Sidebar>
 
-                            <div className="ml-auto flex items-center gap-2">
-                                <span className="text-sm hidden md:inline-block">Welcome, John Doe</span>
-                                <ModeToggle />
+                    {/* Main content area */}
+                    <div className="flex-1 flex flex-col">
+                        {/* Header for the dashboard */}
+                        <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                            <div className="flex h-14 items-center px-4 md:px-6">
+                                <SidebarTrigger />
+
+                                <div className="ml-auto flex items-center gap-2">
+                                    <span className="text-sm hidden md:inline-block">Welcome, {user}</span>
+                                    <ModeToggle />
+                                </div>
                             </div>
-                        </div>
-                    </header>
+                        </header>
 
-                    {/* Page content */}
-                    <main className="flex-1 p-4 md:p-6">
-                        {isMounted && (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.5 }}
-                                className="h-full"
-                            >
-                                {children}
-                            </motion.div>
-                        )}
-                    </main>
+                        {/* Page content */}
+                        <main className="flex-1 p-4 md:p-6">
+                            {isMounted && (
+                                <motion.div
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5 }}
+                                    className="h-full"
+                                >
+                                    {children}
+                                </motion.div>
+                            )}
+                        </main>
+                    </div>
                 </div>
-            </div>
-        </SidebarProvider>
+            </SidebarProvider>
+        </div>
+
     )
 }
