@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -10,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { BACKEND_URL } from "@/constants"
+import axios from 'axios'
 import { Eye, EyeOff } from "lucide-react"
 
 export default function LoginPage() {
@@ -17,15 +18,40 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
 
-        // Simulate authentication
-        setTimeout(() => {
+        const formData = new FormData(e.currentTarget as HTMLFormElement)
+        const email = formData.get("email") as string
+        const password = formData.get("password") as string
+        console.log(email, password);
+
+        try {
+            const response = await axios.post(`${BACKEND_URL}/login`, {
+                email,
+                password,
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+
+            if (response.status === 200) {
+                const data = response.data
+                localStorage.setItem("user", JSON.stringify(data.user))
+                localStorage.setItem("userId", JSON.stringify(data.id))
+                localStorage.setItem("email", JSON.stringify(data.email))
+                router.push("/dashboard")
+            } else {
+                alert("Invalid email or password")
+            }
+
+        } catch (error) {
+            console.log("ERROR DUIRNG LOGIN", error)
+        } finally {
             setIsLoading(false)
-            router.push("/dashboard/scene")
-        }, 1500)
+        }
     }
 
     return (
@@ -50,6 +76,7 @@ export default function LoginPage() {
                                 <Input
                                     id="email"
                                     type="email"
+                                    name="email"
                                     placeholder="you@example.com"
                                     autoComplete="email"
                                     required
@@ -61,6 +88,7 @@ export default function LoginPage() {
                                 <div className="relative">
                                     <Input
                                         id="password"
+                                        name="password"
                                         type={showPassword ? "text" : "password"}
                                         placeholder="••••••••"
                                         autoComplete="current-password"

@@ -12,21 +12,47 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff } from "lucide-react"
+import axios from "axios"
+import { BACKEND_URL } from "@/constants"
 
 export default function SignupPage() {
     const router = useRouter()
     const [isLoading, setIsLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
 
-        // Simulate account creation
-        setTimeout(() => {
+        const formData = new FormData(e.currentTarget as HTMLFormElement)
+        const { firstname, lastname, email, password } = Object.fromEntries(formData.entries())
+
+        try {
+            const response = await axios.post(`${BACKEND_URL}/signup`, {
+                firstname,
+                lastname,
+                email,
+                password,
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+
+            if (response.status.toString().startsWith("2")) {
+                alert("Account created successfully!")
+                router.push("/login")
+            } else {
+                alert(response.data.message || "An error occurred while creating your account.")
+            }
+        } catch (error: any) {
+            console.log(error);
+
+            alert(error.response.data.detail || "An error occurred while creating your account.")
+            console.error("Error creating account:", error)
+        } finally {
             setIsLoading(false)
-            router.push("/dashboard/scene")
-        }, 1500)
+        }
     }
 
     return (
@@ -48,12 +74,12 @@ export default function SignupPage() {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="firstName">First Name</Label>
-                                    <Input id="firstName" placeholder="John" required className="text-base h-12" />
+                                    <Label htmlFor="firstname">First Name</Label>
+                                    <Input id="firstname" name="firstname" placeholder="John" required className="text-base h-12" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="lastName">Last Name</Label>
-                                    <Input id="lastName" placeholder="Doe" required className="text-base h-12" />
+                                    <Label htmlFor="lastname">Last Name</Label>
+                                    <Input id="lastname" name="lastname" placeholder="Doe" required className="text-base h-12" />
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -61,6 +87,7 @@ export default function SignupPage() {
                                 <Input
                                     id="email"
                                     type="email"
+                                    name="email"
                                     placeholder="you@example.com"
                                     autoComplete="email"
                                     required
@@ -72,6 +99,7 @@ export default function SignupPage() {
                                 <div className="relative">
                                     <Input
                                         id="password"
+                                        name="password"
                                         type={showPassword ? "text" : "password"}
                                         placeholder="Create a password"
                                         autoComplete="new-password"
@@ -89,19 +117,6 @@ export default function SignupPage() {
                                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                                     </Button>
                                 </div>
-                            </div>
-                            <div className="flex items-center space-x-2 mt-4">
-                                <Checkbox id="terms" required />
-                                <Label htmlFor="terms" className="text-sm font-normal">
-                                    I agree to the{" "}
-                                    <Link href="#" className="text-primary hover:underline">
-                                        Terms of Service
-                                    </Link>{" "}
-                                    and{" "}
-                                    <Link href="#" className="text-primary hover:underline">
-                                        Privacy Policy
-                                    </Link>
-                                </Label>
                             </div>
                             <Button type="submit" className="w-full h-12 text-base" disabled={isLoading}>
                                 {isLoading ? "Creating account..." : "Create Account"}

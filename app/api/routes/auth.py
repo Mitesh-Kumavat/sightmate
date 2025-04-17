@@ -18,7 +18,7 @@ def get_db():
 def register(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="User with this email already exists")
 
     hashed_password = bcrypt.hash(user.password)
     new_user = User(firstname=user.firstname, lastname=user.lastname, email=user.email, password=hashed_password)
