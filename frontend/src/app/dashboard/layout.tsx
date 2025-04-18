@@ -15,8 +15,6 @@ import {
     BellRing,
     User,
     LogOut,
-    Menu,
-    X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -89,12 +87,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             description: "Extract and read text from documents",
         },
         {
-            title: "Ask a Question",
-            href: "/dashboard/qna",
-            icon: <HelpCircle className="h-5 w-5" />,
-            description: "Get answers to your questions",
-        },
-        {
             title: "Currency Recognizer",
             href: "/dashboard/currency",
             icon: <DollarSign className="h-5 w-5" />,
@@ -105,12 +97,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             href: "/dashboard/art",
             icon: <PaintBrush className="h-5 w-5" />,
             description: "Creative and detailed scene descriptions",
-        },
-        {
-            title: "Emergency Alert",
-            href: "/dashboard/emergency",
-            icon: <BellRing className="h-5 w-5 text-destructive" />,
-            description: "Send emergency alerts with your location",
         },
     ]
 

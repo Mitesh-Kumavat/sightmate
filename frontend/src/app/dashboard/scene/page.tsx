@@ -1,12 +1,17 @@
 "use client"
 
 import { useState } from "react"
-import CameraView from "@/app/dashboard/scene/_component/camera-view"
-import DescriptionResult from "@/app/dashboard/scene/_component/description-result"
+import CameraView from "@/components/dashboard/camera-view"
+import DescriptionResult from "@/components/dashboard/description-result"
 
 export default function ScenePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<string | null>(null)
+    const transcriptOptionsArray = [
+        "capture", "analyze", "take a picture", "analyze road",
+        "analyze scene", "analyze surroundings", "analyze environment",
+        "what is around me", "what is in front of me", "where am i"
+    ]
 
     return (
         <div className="max-w-5xl mx-auto px-4 md:px-0">
@@ -23,6 +28,8 @@ export default function ScenePage() {
                     isAnalyzing={isAnalyzing}
                     setIsAnalyzing={setIsAnalyzing}
                     setResult={setResult}
+                    transcriptOptionsArray={transcriptOptionsArray}
+                    endpoint="/analyze"
                 />
                 <DescriptionResult result={result} isAnalyzing={isAnalyzing} />
             </div>

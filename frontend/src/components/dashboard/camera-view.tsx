@@ -5,34 +5,39 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import axios from "axios"
 import { BACKEND_URL, BASE_BACKEND } from "@/constants"
+import { toast } from "sonner"
 
 interface CameraProps {
     isAnalyzing: boolean
     setIsAnalyzing: (value: boolean) => void
     setResult: (value: string | null) => void
+    transcriptOptionsArray: string[]
+    endpoint: string
 }
 
-export default function CameraView({ isAnalyzing, setIsAnalyzing, setResult }: CameraProps) {
+declare global {
+    interface Window {
+        webkitSpeechRecognition: any
+        SpeechRecognition: any
+    }
+}
+
+
+export default function CameraView({ isAnalyzing, setIsAnalyzing, setResult, transcriptOptionsArray, endpoint }: CameraProps) {
     const videoRef = useRef<HTMLVideoElement>(null)
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
     const recognitionRef = useRef<any>(null)
     const [_audio, setAudio] = useState<HTMLAudioElement | null>(null)
 
-    const transcriptOptionsArray = [
-        "capture", "analyze", "take a picture", "analyze road",
-        "analyze scene", "analyze surroundings", "analyze environment",
-        "what is around me", "what is in front of me", "where am i"
-    ]
+
 
     useEffect(() => {
         startCamera()
         setupSpeechRecognition()
 
         return () => {
-            if (recognitionRef.current) {
-                recognitionRef.current.stop()
-            }
+            if (recognitionRef.current) recognitionRef.current.stop()
         }
     }, [facingMode])
 
@@ -87,17 +92,29 @@ export default function CameraView({ isAnalyzing, setIsAnalyzing, setResult }: C
             formData.append("image", blob, "capture.jpg")
 
             try {
-                const res = await axios.post(`${BACKEND_URL}/analyze`, formData)
-                const { description, audio_path } = res.data
+                const res = await axios.post(`${BACKEND_URL}${endpoint}`, formData);
+
+                if (res.status !== 200) {
+                    setResult(res.data.message || "Failed to analyze the image.")
+                    toast.error(res.data.message || "Failed to analyze the image.")
+                    return
+                }
+                const { description, audio_path, status, message } = res.data
+
+                if (status !== "success" || !description || !audio_path) {
+                    toast.error(message || "Failed to analyze the image.")
+                    setResult(message || "Failed to analyze the image.")
+                    return
+                }
 
                 setResult(description)
 
                 const audioFile = new Audio(audio_path.startsWith("/") ? `${BASE_BACKEND}${audio_path}` : audio_path)
                 setAudio(audioFile)
                 audioFile.play()
-            } catch (err) {
-                console.error("Error analyzing image:", err)
-                setResult("Failed to analyze the image.")
+            } catch (err: any) {
+                toast.error(err.response.data.description || "Failed to analyze the image.")
+                setResult(err.response.data.description || "Failed to analyze the image. Please try again later.")
             } finally {
                 setIsAnalyzing(false)
             }
@@ -108,26 +125,36 @@ export default function CameraView({ isAnalyzing, setIsAnalyzing, setResult }: C
         <Card className="h-full w-full">
             <CardHeader>
                 <CardTitle>Camera View</CardTitle>
-                <CardDescription>Aim your camera and capture surroundings</CardDescription>
+                <CardDescription>Aim your camera and capture</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-col items-center">
-                {/* Video container with responsive aspect ratio */}
-                <div className="relative w-full max-w-3xl aspect-video bg-muted rounded-md overflow-hidden mb-4">
+            <CardContent className="flex flex-col items-center gap-4 px-0 sm:px-4">
+                {/* Responsive video container */}
+                <div className="w-full aspect-[9/16] sm:aspect-video max-h-[80vh] relative bg-black overflow-hidden">
                     <video
                         ref={videoRef}
                         autoPlay
                         playsInline
-                        className="absolute top-0 left-0 w-full h-full object-cover rounded-md"
+                        className="absolute top-0 left-0 w-full h-full object-cover"
                     />
                     <canvas ref={canvasRef} width={640} height={480} className="hidden" />
                 </div>
 
-                {/* Button group */}
-                <div className="flex flex-col sm:flex-row gap-3 w-full max-w-3xl">
-                    <Button size="lg" className="flex-1" onClick={handleAnalyze} disabled={isAnalyzing}>
+                {/* Buttons layout */}
+                <div className="flex flex-col sm:flex-row gap-3 w-full px-4 sm:px-0">
+                    <Button
+                        size="lg"
+                        className="w-full sm:w-1/2"
+                        onClick={handleAnalyze}
+                        disabled={isAnalyzing}
+                    >
                         {isAnalyzing ? "Analyzing..." : "Analyze Scene"}
                     </Button>
-                    <Button variant="outline" size="lg" className="flex-1" onClick={switchCamera}>
+                    <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full sm:w-1/2"
+                        onClick={switchCamera}
+                    >
                         Switch Camera
                     </Button>
                 </div>
