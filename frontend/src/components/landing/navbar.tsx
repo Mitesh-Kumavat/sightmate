@@ -56,27 +56,40 @@ export function Navbar() {
                                 <span className="sr-only">Toggle menu</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right">
-                            <nav className="flex flex-col gap-4 mt-8">
+                        <SheetContent
+                            side="right"
+                            className="w-64 px-6 pt-10 pb-6 bg-background shadow-lg"
+                        >
+                            <div className="mb-6 text-center">
+                                <Link
+                                    href="/"
+                                    className="text-2xl font-bold tracking-tight text-primary"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    SightMate
+                                </Link>
+                            </div>
+                            <nav className="flex flex-col gap-4">
                                 {navLinks.map((link, index) => (
                                     <Link
                                         key={index}
                                         href={link.href}
-                                        className="text-muted-foreground hover:text-foreground transition-colors text-lg py-2"
+                                        className="text-muted-foreground hover:text-foreground transition-colors text-base font-medium"
                                         onClick={() => setIsOpen(false)}
                                     >
                                         {link.label}
                                     </Link>
                                 ))}
-                                <div className="flex flex-col gap-2 mt-4">
-                                    <Button variant="outline" asChild className="w-full">
-                                        <Link href="/login">Login</Link>
-                                    </Button>
-                                    <Button asChild className="w-full">
-                                        <Link href="/signup">Sign Up</Link>
-                                    </Button>
-                                </div>
                             </nav>
+                            <hr className="my-6 border-muted" />
+                            <div className="flex flex-col gap-3">
+                                <Button variant="outline" asChild className="w-full">
+                                    <Link href="/login">Login</Link>
+                                </Button>
+                                <Button asChild className="w-full">
+                                    <Link href="/signup">Sign Up</Link>
+                                </Button>
+                            </div>
                         </SheetContent>
                     </Sheet>
                 </div>
