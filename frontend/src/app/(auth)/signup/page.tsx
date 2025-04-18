@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff } from "lucide-react"
 import axios from "axios"
 import { BACKEND_URL } from "@/constants"
@@ -46,8 +45,6 @@ export default function SignupPage() {
                 alert(response.data.message || "An error occurred while creating your account.")
             }
         } catch (error: any) {
-            console.log(error);
-
             alert(error.response.data.detail || "An error occurred while creating your account.")
             console.error("Error creating account:", error)
         } finally {

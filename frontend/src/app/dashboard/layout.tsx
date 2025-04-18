@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { motion } from "framer-motion"
 import {
@@ -28,7 +28,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ModeToggle } from "@/components/ui/theme-toggler"
 import {
     SidebarProvider,
@@ -57,12 +56,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [isMounted, setIsMounted] = useState(false)
     const [user, setUser] = useState<string | null>("")
     const [email, setEmail] = useState<string | null>("")
+    const router = useRouter();
 
     useEffect(() => {
         const { user, email } = useAuth();
         setIsMounted(true)
         if (!user || !email) {
-            window.location.href = "/"
+            router.push("/")
+            return
         }
         setUser(user)
         setEmail(email)
@@ -167,7 +168,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                         localStorage.removeItem("user")
                                         localStorage.removeItem("userId")
                                         localStorage.removeItem("email")
-                                        window.location.href = "/"
+                                        router.push("/")
                                     }}>
                                         <LogOut className="mr-2 h-4 w-4" />
                                         <span>Logout</span>

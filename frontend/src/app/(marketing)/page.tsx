@@ -5,17 +5,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Navbar } from "@/components/landing/navbar"
 import Link from "next/link"
 import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
 import {
   Camera,
   FileText,
   Newspaper,
-  HelpCircle,
   DollarSign,
   PaintbrushIcon as PaintBrush,
   BellRing,
 } from "lucide-react"
+import { useEffect } from "react"
+import useAuth from "@/hooks/use-auth"
 
 export default function LandingPage() {
+
+  const router = useRouter()
+
   const features = [
     {
       title: "Scene Description",
@@ -75,6 +80,13 @@ export default function LandingPage() {
     "FastAPI",
     "LangChain",
   ]
+
+  useEffect(() => {
+    const { user, userId } = useAuth();
+    if (user && userId) {
+      router.push("/dashboard/scene");
+    }
+  }, [])
 
   return (
     <div className="min-h-screen w-auto mx-auto flex flex-col ">

@@ -25,7 +25,6 @@ export default function LoginPage() {
         const formData = new FormData(e.currentTarget as HTMLFormElement)
         const email = formData.get("email") as string
         const password = formData.get("password") as string
-        console.log(email, password);
 
         try {
             const response = await axios.post(`${BACKEND_URL}/login`, {
@@ -49,7 +48,6 @@ export default function LoginPage() {
 
         } catch (error: any) {
             alert(error.response.data.detail || "An error occurred during login")
-            console.log("ERROR DUIRNG LOGIN", error)
         } finally {
             setIsLoading(false)
         }
