@@ -83,6 +83,9 @@ export default function LandingPage() {
 
   useEffect(() => {
     const { user, userId } = useAuth();
+    console.log("user", user);
+    console.log("userId", userId);
+
     if (user && userId) {
       router.push("/dashboard/scene");
     }

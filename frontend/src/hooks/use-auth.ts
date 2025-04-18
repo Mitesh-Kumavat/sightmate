@@ -10,8 +10,7 @@ export default function useAuth() {
             email
         }
     } catch (error) {
-        window.location.href = "/"
-        console.log(error);
+        console.log("ERROR FROM USEAUTH", error);
         return {
             user: null,
             userId: null,

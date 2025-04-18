@@ -21,6 +21,7 @@ export default function ScenePage() {
     const [_audio, setAudio] = useState<HTMLAudioElement | null>(null)
     const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
     const recognitionRef = useRef<any>(null)
+    const transcriptOptionsArray = ["capture", "analyze", "take a picture", "analyze road", "analyze scene", "analyze surroundings", "analyze environment", "what is around me", "what is in front of me", "where am i"]
 
     useEffect(() => {
         startCamera()
@@ -33,7 +34,7 @@ export default function ScenePage() {
             recognition.interimResults = false
             recognition.onresult = (event: any) => {
                 const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase()
-                if (transcript.includes("capture")) {
+                if (transcriptOptionsArray.some(transcriptOption => transcript.includes(transcriptOption))) {
                     handleAnalyze()
                 }
             }

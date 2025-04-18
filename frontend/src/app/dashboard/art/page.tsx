@@ -1,36 +1,135 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Camera, PaintbrushIcon as PaintBrush } from "lucide-react"
+import { PaintbrushIcon as PaintBrush, RepeatIcon } from "lucide-react"
 import { motion } from "framer-motion"
+import axios from "axios"
+import { BACKEND_URL, BASE_BACKEND } from "@/constants"
+
+declare global {
+    interface Window {
+        webkitSpeechRecognition: any
+        SpeechRecognition: any
+    }
+}
 
 export default function ArtPage() {
+    const videoRef = useRef<HTMLVideoElement>(null)
+    const canvasRef = useRef<HTMLCanvasElement>(null)
     const [isAnalyzing, setIsAnalyzing] = useState(false)
-    const [style, setStyle] = useState("detailed")
     const [result, setResult] = useState<string | null>(null)
+    const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
+    const [audio, setAudio] = useState<HTMLAudioElement | null>(null)
+    const cooldownRef = useRef(false)
+    const transcriptOptionsArray = [
+        "capture",
+        "analyze",
+        "describe",
+        "art",
+        "artistic",
+        "description",
+        "what is",
+        "where am i",
+        "surroundings",
+        "environment",
+        "vision"
+    ]
 
-    const handleAnalyze = () => {
+    const startCamera = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode },
+            })
+            if (videoRef.current) {
+                videoRef.current.srcObject = stream
+            }
+        } catch (error) {
+            console.error("Camera error:", error)
+        }
+    }
+
+    useEffect(() => {
+        startCamera()
+    }, [facingMode])
+
+
+    useEffect(() => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+        if (!SpeechRecognition) return
+
+        const recognition = new SpeechRecognition()
+        recognition.continuous = true
+        recognition.lang = "en-US"
+
+        const startRecognition = () => {
+            try {
+                recognition.start()
+            } catch (err) {
+                console.error("Speech recognition error:", err)
+            }
+        }
+
+        recognition.onend = () => {
+            startRecognition()
+        }
+
+        recognition.onresult = (event: any) => {
+            if (isAnalyzing || cooldownRef.current) return
+
+            const transcript = event.results[event.results.length - 1][0].transcript.toLowerCase()
+            const shouldAnalyze = transcriptOptionsArray.some(option => transcript.includes(option))
+
+            if (shouldAnalyze) {
+                cooldownRef.current = true
+                handleAnalyze().finally(() => {
+                    setTimeout(() => {
+                        cooldownRef.current = false
+                    }, 3000)
+                })
+            }
+        }
+
+        startRecognition()
+
+        return () => recognition.stop()
+    }, [isAnalyzing])
+
+    const handleAnalyze = async () => {
+        if (!videoRef.current || !canvasRef.current) return
+
         setIsAnalyzing(true)
         setResult(null)
 
-        // Simulate AI processing
-        setTimeout(() => {
-            setIsAnalyzing(false)
+        const ctx = canvasRef.current.getContext("2d")
+        if (!ctx) return
 
-            const descriptions = {
-                detailed:
-                    "You are in a cozy living room bathed in warm golden light from a setting sun. The walls are painted a soft cream color, adorned with framed landscape paintings that capture serene countryside scenes. A plush brown leather sofa sits in the center, topped with burgundy and mustard-colored pillows. A handcrafted oak coffee table rests on a woven area rug with intricate patterns in shades of burgundy and navy. A bookshelf in the corner houses leather-bound classics and small ceramic figurines. The gentle scent of cinnamon and vanilla hangs in the air, while soft classical music plays from hidden speakers, creating a perfect atmosphere for relaxation and contemplation.",
-                poetic:
-                    "The living space unfolds like a sonnet, bathed in honeyed light as day surrenders to dusk. Walls of alabaster stand as canvas to framed dreams of distant meadows where imagination roams free. The leather throne, rich as autumn earth, cradles burgundy and golden treasures like fallen leaves. A wooden altar, carved by devoted hands, anchors the scene upon a tapestry woven with stories untold. In the corner, wisdom waits in leather bindings, while porcelain dancers stand frozen mid-performance. Cinnamon clouds dance with vanilla whispers as invisible musicians paint the air with Baroque brushstrokes. Here, time itself pauses, allowing the soul to breathe.",
-                minimal:
-                    "Living room. Cream walls with landscape paintings. Brown leather sofa with burgundy and yellow pillows. Wooden coffee table on patterned rug. Bookshelf with books and figurines. Cinnamon scent. Classical music playing softly.",
+        ctx.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height)
+
+        canvasRef.current.toBlob(async (blob) => {
+            if (!blob) return
+
+            const formData = new FormData()
+            formData.append("image", blob, "photo.jpg")
+
+            try {
+                const res = await axios.post(`${BACKEND_URL}/art`, formData)
+                const { description, audio_path } = res.data
+
+                setResult(description)
+
+                const audioFile = new Audio(audio_path.startsWith("/") ? `${BASE_BACKEND}${audio_path}` : audio_path)
+                setAudio(audioFile)
+                audioFile.play()
+
+            } catch (error) {
+                console.error("Art API Error:", error)
+                setResult("Failed to generate artistic description.")
+            } finally {
+                setIsAnalyzing(false)
             }
-
-            setResult(descriptions[style as keyof typeof descriptions])
-        }, 2000)
+        }, "image/jpeg")
     }
 
     return (
@@ -47,27 +146,25 @@ export default function ArtPage() {
                         <CardDescription>Capture your surroundings for artistic description</CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col items-center">
-                        <div className="w-full aspect-video bg-muted relative rounded-md overflow-hidden flex items-center justify-center mb-4">
-                            <Camera className="h-16 w-16 text-muted-foreground/50" />
+                        <div className="w-full aspect-video bg-muted relative rounded-md overflow-hidden mb-4">
+                            <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover rounded-md" />
+                            <canvas ref={canvasRef} width={640} height={480} className="hidden" />
                         </div>
 
-                        <div className="w-full mb-4">
-                            <label className="text-sm font-medium mb-1 block">Description Style</label>
-                            <Select defaultValue="detailed" onValueChange={setStyle}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select style" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="detailed">Detailed</SelectItem>
-                                    <SelectItem value="poetic">Poetic</SelectItem>
-                                    <SelectItem value="minimal">Minimal</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
 
-                        <Button size="lg" className="w-full text-base" onClick={handleAnalyze} disabled={isAnalyzing}>
-                            {isAnalyzing ? "Creating..." : "Create Artistic Description"}
-                        </Button>
+                        <div className="flex w-full gap-2">
+                            <Button size="lg" className="w-full text-base" onClick={handleAnalyze} disabled={isAnalyzing}>
+                                {isAnalyzing ? "Creating..." : "Create Artistic Description"}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={() => setFacingMode(facingMode === "user" ? "environment" : "user")}
+                                title="Switch Camera"
+                            >
+                                <RepeatIcon className="w-5 h-5" />
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
 
