@@ -25,7 +25,7 @@ prompts = {
     "analyze-document": (
         "Extract all readable text from the image of a document, preserving the original structure as closely as possible. "
         "Then summarize the main message of the document in 3–5 lines. "
-        "Example: 'This is a document with the following summary: Ramesh plans a surprise birthday gift for you.'"
+        "Output Example: 'This is a document with the following summary: Ramesh plans a surprise birthday gift for you.'"
     ),
 
     "analyze-art": (

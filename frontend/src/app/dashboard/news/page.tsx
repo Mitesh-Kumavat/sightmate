@@ -1,116 +1,69 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import axios from "axios"
+import DescriptionResult from "@/components/dashboard/description-result"
+import useVoiceCommand from "@/hooks/use-voice-command"
+import { speakWithWebSpeech } from "@/utils/camera.utils"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Newspaper } from "lucide-react"
-import { motion } from "framer-motion"
 
-type NewsCategory = "world" | "technology" | "health" | "sports"
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000/api"
 
 export default function NewsPage() {
-    const [isLoading, setIsLoading] = useState(false)
-    const [selectedCategory, setSelectedCategory] = useState<NewsCategory>("world")
+    const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<string | null>(null)
 
-    const handleGetNews = () => {
-        setIsLoading(true)
-        setResult(null)
+    const fetchNews = useCallback(async () => {
+        setIsAnalyzing(true)
+        try {
+            const response = await axios.get(`${BACKEND_URL}/news`)
+            const { news_summary, audio_path, status } = response.data
+            setResult(news_summary)
 
-        // Simulate AI processing
-        setTimeout(() => {
-            setIsLoading(false)
-
-            const newsContent = {
-                world:
-                    "Today's top world news: 1) United Nations Summit addresses climate change with new global initiatives. 2) Peace talks resume in conflict region with mediation from neighboring countries. 3) Major economic forum concludes with agreements on international trade reforms.",
-                technology:
-                    "Today's technology headlines: 1) New AI breakthrough enables more natural conversation with digital assistants. 2) Tech company unveils smartphone with revolutionary battery technology. 3) Global cybersecurity report warns of increasing sophisticated attacks targeting infrastructure.",
-                health:
-                    "Today's health updates: 1) Research shows promising results for new treatment approach to common neurological disorders. 2) Global health organization launches campaign to address mental health awareness. 3) New nutritional guidelines released focusing on sustainable food choices.",
-                sports:
-                    "Today's sports highlights: 1) Underdog team defeats champions in major upset at international tournament. 2) Record-breaking performance at world athletics championship by newcomer athlete. 3) Historic rivalry match ends in dramatic tie after extended play.",
+            if (status === "success" && audio_path) {
+                const audio = new Audio(
+                    audio_path.startsWith("/") ? `${BACKEND_URL}${audio_path}` : audio_path
+                )
+                audio.play()
+            } else {
+                speakWithWebSpeech(news_summary)
             }
+        } catch (err: any) {
+            setResult(err.response.data.news_summary || "Failed to fetch news. Please try again.")
+            speakWithWebSpeech(err.response.data.news_summary || "Sorry, I couldn't fetch the news right now.")
+        } finally {
+            setIsAnalyzing(false)
+        }
 
-            setResult(newsContent[selectedCategory])
-        }, 1500)
-    }
+
+    }, [])
+
+
+    useVoiceCommand({
+        commands: [
+            "news", "today's news", "current news", "fetch news", "get news",
+            "latest news", "top news", "headlines", "news headlines"
+        ],
+        onCommandMatch: fetchNews
+    })
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl font-bold mb-6">News Summarizer</h1>
-            <p className="text-lg text-muted-foreground mb-8">Get concise audio summaries of today's top news stories.</p>
+        < div className="max-w-5xl mx-auto px-4 md:px-0" >
+            <h1 className="text-3xl font-bold mb-6">News Summary</h1>
+            <p className="text-lg text-muted-foreground mb-2">
+                Speak something like <strong>"today's news"</strong> or press the button below.
+            </p>
+            <p className="text-sm text-muted-foreground mb-4">
+                Voice command powered by Whisper. Response powered by AI and optionally text-to-speech.
+            </p>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Today's News</CardTitle>
-                    <CardDescription>Select a category and get summarized news</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <Tabs
-                        defaultValue="world"
-                        className="w-full"
-                        onValueChange={(value) => setSelectedCategory(value as NewsCategory)}
-                    >
-                        <TabsList className="grid grid-cols-4 mb-6">
-                            <TabsTrigger value="world">World</TabsTrigger>
-                            <TabsTrigger value="technology">Technology</TabsTrigger>
-                            <TabsTrigger value="health">Health</TabsTrigger>
-                            <TabsTrigger value="sports">Sports</TabsTrigger>
-                        </TabsList>
+            <Button onClick={fetchNews} disabled={isAnalyzing}>
+                {isAnalyzing ? "Fetching..." : "Fetch Today's News"}
+            </Button>
 
-                        <TabsContent value="world" className="mt-0">
-                            <div className="flex items-center justify-center py-6">
-                                <Newspaper className="h-16 w-16 text-primary/50" />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="technology" className="mt-0">
-                            <div className="flex items-center justify-center py-6">
-                                <Newspaper className="h-16 w-16 text-primary/50" />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="health" className="mt-0">
-                            <div className="flex items-center justify-center py-6">
-                                <Newspaper className="h-16 w-16 text-primary/50" />
-                            </div>
-                        </TabsContent>
-                        <TabsContent value="sports" className="mt-0">
-                            <div className="flex items-center justify-center py-6">
-                                <Newspaper className="h-16 w-16 text-primary/50" />
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-
-                    <Button size="lg" className="w-full text-base" onClick={handleGetNews} disabled={isLoading}>
-                        {isLoading ? "Loading News..." : "Get Today's News"}
-                    </Button>
-
-                    <div className="w-full rounded-md border p-4 min-h-[200px]" aria-live="polite">
-                        {isLoading ? (
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="flex flex-col items-center h-full justify-center"
-                            >
-                                <div className="h-8 w-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin mb-4" />
-                                <p className="text-center text-muted-foreground">Fetching today's news...</p>
-                            </motion.div>
-                        ) : result ? (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <p className="text-lg font-medium mb-2">
-                                    Today's {selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} News
-                                </p>
-                                <p className="text-base leading-relaxed">{result}</p>
-                            </motion.div>
-                        ) : (
-                            <p className="text-center text-muted-foreground h-full flex items-center justify-center">
-                                News summary will appear here
-                            </p>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+            <div className="mt-6">
+                <DescriptionResult result={result} isAnalyzing={isAnalyzing} />
+            </div>
+        </div >
     )
 }

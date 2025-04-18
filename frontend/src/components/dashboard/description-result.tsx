@@ -13,7 +13,7 @@ export default function DescriptionResult({ result, isAnalyzing }: Props) {
         <Card>
             <CardHeader>
                 <CardTitle>Description</CardTitle>
-                <CardDescription>AI-powered scene analysis</CardDescription>
+                <CardDescription>AI-powered analysis</CardDescription>
             </CardHeader>
             <CardContent>
                 <div
@@ -23,14 +23,14 @@ export default function DescriptionResult({ result, isAnalyzing }: Props) {
                     {isAnalyzing ? (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center">
                             <div className="h-8 w-8 rounded-full border-4 border-primary/30 border-t-primary animate-spin mb-4" />
-                            <p className="text-center text-muted-foreground">Analyzing your surroundings...</p>
+                            <p className="text-center text-muted-foreground">Analyzing...</p>
                         </motion.div>
                     ) : result ? (
                         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-base leading-relaxed">
                             {result}
                         </motion.p>
                     ) : (
-                        <p className="text-center text-muted-foreground">Scene description will appear here after analysis</p>
+                        <p className="text-center text-muted-foreground">Description will appear here after analysis</p>
                     )}
                 </div>
             </CardContent>

@@ -37,8 +37,8 @@ async def analyze_scene(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 content={
                     "status": "error",
-                    "message": "TTS failed due to rate limits.",
-                    "description": "TTS failed due to rate limits.",
+                    "message": "TTS failed due to rate limits. Please try again later.",
+                    "description": description,
                     "audio_path": None,
                 },
             )

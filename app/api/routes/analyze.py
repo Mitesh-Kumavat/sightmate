@@ -32,7 +32,8 @@ async def analyze_scene(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 content={
                     "status": "error",
-                    "description": "Max GROQ API limits reached. Please try again later.",
+                    "message": "Max GROQ API limits reached. Please try again later.",
+                    "description": description,
                 }
             )
 

@@ -17,7 +17,6 @@ async def analyze_scene(
         image_path = await save_upload_file_tmp(image)
 
         description = describe_image_for_blind(image_path, "analyze-document")
-        print(description)
 
         background_tasks.add_task(delete_file, image_path)
 
@@ -39,8 +38,8 @@ async def analyze_scene(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 content={
                     "status": "error",
-                    "message": "TTS failed due to rate limits.",
-                    "description": "TTS failed due to rate limits.",
+                    "message": "TTS failed due to rate limits. Please try again.",
+                    "description": description,
                     "audio_path": None,
                 },
             )
