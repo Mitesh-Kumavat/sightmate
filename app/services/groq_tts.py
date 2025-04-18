@@ -19,5 +19,4 @@ def generate_tts_audio(text: str) -> str:
 
         return speech_file_name
     except Exception as e:
-        print(f"Error generating TTS audio: {e}")
         return None

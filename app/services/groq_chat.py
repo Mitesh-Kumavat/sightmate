@@ -22,5 +22,4 @@ def get_indian_news():
         
         return ans
     except Exception as e:
-        print(f"Error in Groq Chat Model: {e}")
         return None
