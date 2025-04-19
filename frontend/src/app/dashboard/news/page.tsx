@@ -6,8 +6,7 @@ import DescriptionResult from "@/components/dashboard/description-result"
 import useVoiceCommand from "@/hooks/use-voice-command"
 import { speakWithWebSpeech } from "@/utils/camera.utils"
 import { Button } from "@/components/ui/button"
-
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000/api"
+import { BACKEND_URL, BASE_BACKEND } from "@/constants"
 
 export default function NewsPage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -22,7 +21,7 @@ export default function NewsPage() {
 
             if (status === "success" && audio_path) {
                 const audio = new Audio(
-                    audio_path.startsWith("/") ? `${BACKEND_URL}${audio_path}` : audio_path
+                    audio_path.startsWith("/") ? `${BASE_BACKEND}${audio_path}` : audio_path
                 )
                 audio.play()
             } else {
@@ -34,8 +33,6 @@ export default function NewsPage() {
         } finally {
             setIsAnalyzing(false)
         }
-
-
     }, [])
 
 

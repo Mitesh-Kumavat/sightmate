@@ -16,7 +16,7 @@ def delete_file(path: str):
         
         print(f"Failed to delete file {path}: {e}")
 
-async def delete_file_after_delay(file_path: str, delay_seconds: int = 100):
+async def delete_file_after_delay(file_path: str, delay_seconds: int = 150):
     await asyncio.sleep(delay_seconds)
     if os.path.exists("static/"+ file_path):
         try:
