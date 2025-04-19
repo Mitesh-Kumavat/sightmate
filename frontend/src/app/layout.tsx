@@ -7,9 +7,12 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "SightMate – AI-Powered Vision for the Blind",
+  title: "SightMate",
   description:
     "Empowering the visually impaired with smart scene analysis, real-time voice guidance, and accessible digital assistance.",
+  icons: {
+    icon: "/favicon.png",
+  }
 }
 
 export default function RootLayout({
@@ -26,7 +29,6 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
         >
           {children}
           <Toaster />
