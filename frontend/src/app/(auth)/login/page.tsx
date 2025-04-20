@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { BACKEND_URL } from "@/constants"
 import axios from 'axios'
 import { Eye, EyeOff } from "lucide-react"
+import { toast } from "sonner"
 
 export default function LoginPage() {
     const router = useRouter()
@@ -37,17 +38,18 @@ export default function LoginPage() {
             })
 
             if (response.status === 200) {
+                toast.success("Login successful!")
                 const data = response.data
                 localStorage.setItem("user", JSON.stringify(data.user))
                 localStorage.setItem("userId", JSON.stringify(data.id))
                 localStorage.setItem("email", JSON.stringify(data.email))
                 router.push("/dashboard")
             } else {
-                alert("Invalid email or password")
+                toast.error("Invalid email or password")
             }
 
         } catch (error: any) {
-            alert(error.response.data.detail || "An error occurred during login")
+            toast.error(error.response.data.detail || "An error occurred during login")
         } finally {
             setIsLoading(false)
         }

@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Eye, EyeOff } from "lucide-react"
 import axios from "axios"
 import { BACKEND_URL } from "@/constants"
+import { toast } from "sonner"
 
 export default function SignupPage() {
     const router = useRouter()
@@ -39,13 +40,13 @@ export default function SignupPage() {
             })
 
             if (response.status.toString().startsWith("2")) {
-                alert("Account created successfully!")
+                toast.success("Account created successfully!")
                 router.push("/login")
             } else {
-                alert(response.data.message || "An error occurred while creating your account.")
+                toast.error(response.data.message || "An error occurred while creating your account.")
             }
         } catch (error: any) {
-            alert(error.response.data.detail || "An error occurred while creating your account.")
+            toast.error(error.response.data.detail || "An error occurred while creating your account.")
             console.error("Error creating account:", error)
         } finally {
             setIsLoading(false)

@@ -39,7 +39,7 @@ export default function NewsPage() {
     useVoiceCommand({
         commands: [
             "news", "today's news", "current news", "fetch news", "get news",
-            "latest news", "top news", "headlines", "news headlines"
+            "latest news", "top news", "headlines", "news headlines", "analyse", "take", "click",
         ],
         onCommandMatch: fetchNews
     })

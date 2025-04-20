@@ -5,21 +5,55 @@ declare global {
     }
 }
 
-export const setupSpeechRecognition = (options: string[], onMatch: () => void) => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+export const setupSpeechRecognition = (
+    options: string[],
+    onMatch: () => void
+) => {
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) return null
 
     const recognition = new SpeechRecognition()
     recognition.continuous = true
     recognition.lang = "en-US"
 
+    let isManuallyStopped = false
+
     recognition.onresult = (event: any) => {
         const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase()
-        if (options.some(opt => transcript.includes(opt))) onMatch()
+        console.log("Heard:", transcript)
+        if (options.some(opt => transcript.includes(opt))) {
+            onMatch()
+            console.log("Command matched:", transcript)
+        }
     }
 
-    recognition.onerror = console.error
-    recognition.start()
+    recognition.onerror = (err: any) => {
+        console.error("SpeechRecognition error:", err)
+    }
+
+    recognition.onend = () => {
+        if (!isManuallyStopped) {
+            console.log("SpeechRecognition ended. Restarting...")
+            try {
+                recognition.start()
+            } catch (e) {
+                console.warn("Restart failed:", e)
+            }
+        }
+    }
+
+    try {
+        recognition.start()
+    } catch (e) {
+        console.warn("Start failed:", e)
+    }
+
+    // Add a custom stop method for cleanup
+    recognition.stopManually = () => {
+        isManuallyStopped = true
+        recognition.stop()
+    }
 
     return recognition
 }

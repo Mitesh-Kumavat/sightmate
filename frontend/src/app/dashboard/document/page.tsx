@@ -8,7 +8,7 @@ export default function ScenePage() {
     const [isAnalyzing, setIsAnalyzing] = useState(false)
     const [result, setResult] = useState<string | null>(null)
     const transcriptOptionsArray = [
-        "capture", "analyze", "document", "image",
+        "capture", "analyze", "document", "analyse", "take", "click", "image",
         "what", "describe", "explain", "text", "read", "analyze text"]
 
     return (

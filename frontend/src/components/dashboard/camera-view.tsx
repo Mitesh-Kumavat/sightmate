@@ -31,9 +31,8 @@ export default function CameraView({
     useEffect(() => {
         if (!videoRef.current || !canvasRef.current) return
 
-        if (videoRef.current) {
-            startCamera(videoRef as React.RefObject<HTMLVideoElement>, facingMode)
-        }
+        startCamera(videoRef as React.RefObject<HTMLVideoElement>, facingMode)
+
         recognitionRef.current = setupSpeechRecognition(transcriptOptionsArray, () =>
             handleAnalyzeImage({
                 videoRef: videoRef as React.RefObject<HTMLVideoElement>,
@@ -43,7 +42,8 @@ export default function CameraView({
                 endpoint
             })
         )
-        return () => recognitionRef.current?.stop()
+
+        return () => recognitionRef.current?.stopManually?.()
     }, [facingMode])
 
     const switchCamera = () =>
@@ -70,12 +70,12 @@ export default function CameraView({
                         size="lg"
                         className="w-full sm:w-1/2"
                         onClick={() =>
-                            handleAnalyzeImage({ 
-                                videoRef: videoRef as React.RefObject<HTMLVideoElement>, 
-                                canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>, 
-                                setIsAnalyzing, 
-                                setResult, 
-                                endpoint 
+                            handleAnalyzeImage({
+                                videoRef: videoRef as React.RefObject<HTMLVideoElement>,
+                                canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
+                                setIsAnalyzing,
+                                setResult,
+                                endpoint
                             })
                         }
                         disabled={isAnalyzing}
