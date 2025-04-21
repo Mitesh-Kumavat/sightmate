@@ -26,6 +26,7 @@ export default function CameraView({
     const videoRef = useRef<HTMLVideoElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const recognitionRef = useRef<any>(null)
+    const [isAudioPlaying, setIsAudioPlaying] = useState(false)
     const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
 
     useEffect(() => {
@@ -33,15 +34,21 @@ export default function CameraView({
 
         startCamera(videoRef as React.RefObject<HTMLVideoElement>, facingMode)
 
-        recognitionRef.current = setupSpeechRecognition(transcriptOptionsArray, () =>
+        recognitionRef.current = setupSpeechRecognition(transcriptOptionsArray, () => {
+            if (isAnalyzing || isAudioPlaying) return // Don't run if busy
             handleAnalyzeImage({
                 videoRef: videoRef as React.RefObject<HTMLVideoElement>,
                 canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
                 setIsAnalyzing,
                 setResult,
-                endpoint
+                endpoint,
+                recognitionRef,
+                setIsAudioPlaying,
+                isAudioPlaying,
             })
-        )
+        })
+
+
 
         return () => recognitionRef.current?.stopManually?.()
     }, [facingMode])
@@ -69,18 +76,22 @@ export default function CameraView({
                     <Button
                         size="lg"
                         className="w-full sm:w-1/2"
-                        onClick={() =>
+                        onClick={() => {
+                            if (isAnalyzing || isAudioPlaying) return
                             handleAnalyzeImage({
                                 videoRef: videoRef as React.RefObject<HTMLVideoElement>,
                                 canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
                                 setIsAnalyzing,
                                 setResult,
-                                endpoint
+                                endpoint,
+                                recognitionRef,
+                                setIsAudioPlaying,
+                                isAudioPlaying,
                             })
-                        }
-                        disabled={isAnalyzing}
+                        }}
+                        disabled={isAnalyzing || isAudioPlaying}
                     >
-                        {isAnalyzing ? "Analyzing..." : "Analyze Scene"}
+                        {isAnalyzing ? "Analyzing..." : isAudioPlaying ? "Waiting for Audio..." : "Analyze Scene"}
                     </Button>
                     <Button
                         variant="outline"

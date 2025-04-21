@@ -1,5 +1,9 @@
-export const speakWithWebSpeech = (text: string) => {
+export const speakWithWebSpeech = (text: string, onEnd?: () => void) => {
+    if (!window.speechSynthesis) return
+
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = "en-US"
+    utterance.onend = () => {
+        onEnd?.()
+    }
     speechSynthesis.speak(utterance)
 }
