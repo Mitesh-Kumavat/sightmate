@@ -88,14 +88,14 @@ Blind people deserve a modern, reliable, voice-first experience that goes beyond
 
 ## 📽️ Demo & Deliverables
 
-- 🎥 **Demo Video:** *[YouTube / Loom link here]*  
-- 📊 **Pitch Deck / Slides:** *[Google Slides / PDF link here]*
+- 🎥 **Demo Video:** *[YouTube](https://youtu.be/tH8MsqGeQG0)*  
+- 📊 **Pitch Deck / Slides:** *[Google Slides](https://docs.google.com/presentation/d/1U4Ki8yHpmM3ZujWhDRVU6rX4RqyjUyUcjV9CdKI9oHI/edit?usp=sharing)*
 
 ---
 
 ## ✅ Submission Checklist
 
-- [ ] Followed 2 social channels & filled the form  
+- ✅ Followed 2 social channels & filled the form  
 - [ ] Shared badges and submitted Bonus Task 1 (2 pts)  
 - ✅ Signed up for Sprint.dev & completed Bonus Task 2 (3 pts)  
 
