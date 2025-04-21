@@ -26,26 +26,36 @@ export default function CameraView({
     const videoRef = useRef<HTMLVideoElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const recognitionRef = useRef<any>(null)
-    const [isAudioPlaying, setIsAudioPlaying] = useState(false)
     const [facingMode, setFacingMode] = useState<"user" | "environment">("environment")
+    const isAudioPlayingRef = useRef(false)
+    const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+
+    const setAudioPlaying = (val: boolean) => {
+        isAudioPlayingRef.current = val
+        setIsAudioPlaying(val)
+    }
+
 
     useEffect(() => {
         if (!videoRef.current || !canvasRef.current) return
 
         startCamera(videoRef as React.RefObject<HTMLVideoElement>, facingMode)
 
-        recognitionRef.current = setupSpeechRecognition(transcriptOptionsArray, () => {
-            if (isAnalyzing || isAudioPlaying) return // Don't run if busy
-            handleAnalyzeImage({
-                videoRef: videoRef as React.RefObject<HTMLVideoElement>,
-                canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
-                setIsAnalyzing,
-                setResult,
-                endpoint,
-                recognitionRef,
-                setIsAudioPlaying,
-                isAudioPlaying,
-            })
+        recognitionRef.current = setupSpeechRecognition({
+            options: transcriptOptionsArray,
+            onMatch: () => {
+                if (isAnalyzing || isAudioPlayingRef.current) return
+                handleAnalyzeImage({
+                    videoRef: videoRef as React.RefObject<HTMLVideoElement>,
+                    canvasRef: canvasRef as React.RefObject<HTMLCanvasElement>,
+                    setIsAnalyzing,
+                    setResult,
+                    endpoint,
+                    recognitionRef,
+                    setAudioPlaying
+                })
+            },
+            isAudioPlayingRef
         })
 
 

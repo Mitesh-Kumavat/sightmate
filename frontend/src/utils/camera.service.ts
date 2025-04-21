@@ -9,6 +9,8 @@ interface AnalyzeParams {
     setIsAnalyzing: (v: boolean) => void
     setResult: (v: string | null) => void
     endpoint: string
+    recognitionRef?: React.MutableRefObject<any>
+    setAudioPlaying?: (v: boolean) => void
 }
 
 interface AnalyzeParams {
@@ -39,6 +41,8 @@ export const handleAnalyzeImage = async ({
     setIsAnalyzing(true)
     setResult(null)
 
+    recognitionRef?.current?.stopManually?.()
+
     const ctx = canvasRef.current.getContext("2d")
     if (!ctx) return
 
@@ -64,6 +68,7 @@ export const handleAnalyzeImage = async ({
             }
 
             setResult(description)
+            setIsAudioPlaying?.(true)
 
             if (recognitionRef?.current?.stop) {
                 recognitionRef.current.stop()

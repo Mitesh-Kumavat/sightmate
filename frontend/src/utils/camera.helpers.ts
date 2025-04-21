@@ -4,14 +4,22 @@ declare global {
         webkitSpeechRecognition: any
     }
 }
-
-export const setupSpeechRecognition = (
-    options: string[],
+interface SetupSpeechProps {
+    options: string[]
     onMatch: () => void
-) => {
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) return null
+    isAudioPlayingRef: React.MutableRefObject<boolean>
+}
+
+export const setupSpeechRecognition = ({
+    options,
+    onMatch,
+    isAudioPlayingRef
+}: SetupSpeechProps) => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+        console.warn("SpeechRecognition API not supported in this browser.")
+        return null
+    }
 
     const recognition = new SpeechRecognition()
     recognition.continuous = true
@@ -21,24 +29,21 @@ export const setupSpeechRecognition = (
 
     recognition.onresult = (event: any) => {
         const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase()
-        console.log("Heard:", transcript)
         if (options.some(opt => transcript.includes(opt))) {
             onMatch()
-            console.log("Command matched:", transcript)
         }
     }
 
     recognition.onerror = (err: any) => {
-        console.error("SpeechRecognition error:", err)
+        console.error("[❌ SpeechRecognition Error]:", err)
     }
 
     recognition.onend = () => {
-        if (!isManuallyStopped) {
-            console.log("SpeechRecognition ended. Restarting...")
+        if (!isManuallyStopped && !isAudioPlayingRef.current) {
             try {
                 recognition.start()
             } catch (e) {
-                console.warn("Restart failed:", e)
+                console.warn("[❌ Restart Failed]:", e)
             }
         }
     }
@@ -46,17 +51,28 @@ export const setupSpeechRecognition = (
     try {
         recognition.start()
     } catch (e) {
-        console.warn("Start failed:", e)
+        console.warn("[❌ Initial Start Failed]:", e)
     }
 
-    // Add a custom stop method for cleanup
     recognition.stopManually = () => {
         isManuallyStopped = true
         recognition.stop()
     }
 
+    recognition.startManually = () => {
+        isManuallyStopped = false
+        if (!isAudioPlayingRef.current) {
+            try {
+                recognition.start()
+            } catch (e) {
+                console.warn("[❌ Manual Start Failed]:", e)
+            }
+        }
+    }
+
     return recognition
 }
+
 
 export const startCamera = async (
     videoRef: React.RefObject<HTMLVideoElement>,
