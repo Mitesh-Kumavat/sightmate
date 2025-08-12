@@ -3,7 +3,7 @@ import os
 from ..utils.news_fetcher import get_latest_news
 
 client = Groq(
-    api_key='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',
+    api_key=os.environ.get("GROQ_API_KEY"),
 )
 
 news = get_latest_news()
