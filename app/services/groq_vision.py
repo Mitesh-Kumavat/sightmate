@@ -2,7 +2,7 @@ import os
 import base64
 from groq import Groq
 
-client:Groq = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+client:Groq = Groq(api_key='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')
 
 def image_to_base64(image_path: str) -> str:
     with open(image_path, "rb") as img_file:

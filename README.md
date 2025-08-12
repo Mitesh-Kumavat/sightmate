@@ -1,12 +1,4 @@
-# ![Banner](https://github.com/user-attachments/assets/a1493b84-e4e2-456e-a791-ce35ee2bcf2f)  
 # 🚀 **SightMate – Your AI-Powered Companion for the Visually Impaired**
-
----
-
-## 📌 Problem Statement
-
-**Track:** *Problem Statement 1 – Weave AI Magic With Groq* 
--- 
 Visually impaired individuals face significant challenges navigating public spaces, accessing information, and staying informed. SightMate solves this by combining vision, audio, and language models into an accessible AI-first platform.
 
 ---
@@ -21,19 +13,6 @@ SightMate is an AI-driven, voice-first assistant designed to empower blind and v
 - Artistic scene understanding  
 - Daily news summaries  
 
-Built using Groq’s ultra-fast LLM inference SightMate creates a truly **assistive and inclusive experience**.
-
----
-
-## 🧠 Team & Approach
-
-**👥 Team Name:** `Lucid Reapers`
-
-| Name            | Role               | Links |
-|-----------------|--------------------|-------|
-| Mitesh Kumavat  | Backend Developer  | [GitHub](https://github.com/mitesh-kumavat) \| [LinkedIn](https://linkedin.com/in/mitesh-kumavat) |
-| Shivangi Gohel  | Frontend Developer | [GitHub](https://github.com/shivangi-gohel) \| [LinkedIn](https://www.linkedin.com/in/shivangi-gohel-54339b330/) |
-
 **Approach:**  
 Blind people deserve a modern, reliable, voice-first experience that goes beyond basic OCR or TTS. SightMate combines powerful LLMs with real-time computer vision and speech processing to truly assist in daily life.
 
@@ -46,17 +25,10 @@ Blind people deserve a modern, reliable, voice-first experience that goes beyond
 - **Backend:** FastAPI (Python)  
 - **Database:** SQLite  
 - **Hosting:** Vercel (Frontend) + Render (Backend)
-
-### ⚡ Sponsor Tech:
-- ✅ **Groq:** Used for ultra-fast inference with:
+- **Groq:** Used for ultra-fast inference with:
     - `LLaVA` for image-based understanding
     - `Mixtral` for LLM-based Q&A
     - `TTS` for expressive voice generation  
-- ⬜ Monad  
-- ⬜ Fluvio  
-- ⬜ Base  
-- ⬜ Screenpipe  
-- ⬜ Stellar  
 
 ---
 
@@ -89,15 +61,6 @@ Blind people deserve a modern, reliable, voice-first experience that goes beyond
 ## 📽️ Demo & Deliverables
 
 - 🎥 **Demo Video:** *[YouTube](https://youtu.be/tH8MsqGeQG0)*  
-- 📊 **Pitch Deck / Slides:** *[Google Slides](https://docs.google.com/presentation/d/1U4Ki8yHpmM3ZujWhDRVU6rX4RqyjUyUcjV9CdKI9oHI/edit?usp=sharing)*
-
----
-
-## ✅ Submission Checklist
-
-- ✅ Followed 2 social channels & filled the form  
-- [ ] Shared badges and submitted Bonus Task 1 (2 pts)  
-- ✅ Signed up for Sprint.dev & completed Bonus Task 2 (3 pts)  
 
 ---
 
@@ -154,7 +117,6 @@ npm run dev
 
 - [Groq API](https://console.groq.com/)
 - FastAPI, Uvicorn, SQLModel  
-- Special thanks to mentors.
 
 ---
 
@@ -162,7 +124,5 @@ npm run dev
 
 > SightMate isn’t just a project — it’s a mission.  
 > A mission to make the world more inclusive, one intelligent voice at a time.
-
-With Groq’s lightning-fast models and thoughtful design, we’re redefining how visually impaired people experience the world — through **sound, intelligence, and care.**
 
 ---

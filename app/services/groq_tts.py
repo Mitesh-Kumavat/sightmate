@@ -2,7 +2,7 @@ import os
 from groq import Groq
 from uuid import uuid4
 
-client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+client = Groq(api_key='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')
 
 def generate_tts_audio(text: str) -> str:
     try:
@@ -19,4 +19,5 @@ def generate_tts_audio(text: str) -> str:
 
         return speech_file_name
     except Exception as e:
+        print(f"Error generating TTS audio: {e}")
         return None

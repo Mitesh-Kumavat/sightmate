@@ -1,19 +1,20 @@
 from groq import Groq
 import os
-import datetime
+from ..utils.news_fetcher import get_latest_news
 
 client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
+    api_key='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',
 )
 
+news = get_latest_news()
+
 def get_indian_news():
-    today_date = datetime.datetime.now().strftime("%d-%m-%Y")
     try:
         chat_completion = client.chat.completions.create(
             messages=[
                 {
                     "role": "user",
-                    "content": f"Give me the latest news from India of today's date which is {today_date}, in 3 bullet points. Expelain in little summary type and provide the source for each news. Expected output : news1 is from source and the news is :news1 , and so on.. (Make sure that source contains only the name of the news source and not the URL) and the response should be only in text format not markdwon nor json format. So that it can be utilized in a text to speech application. ",
+                    "content": f"{news} this is the data of the today's news you have to summarize each and every news in the shortest way without lossing the main content of the news and then return it(the whole response should not exceed 500 words not more than this so the complete response should be only 10-11 lines max), make sure the response should be only in text format not markdwon nor json format. So that it can be utilized in a text to speech application. give directly the response without any extra text or explanation. DO NOT ADD ANYTHING ELSE",
                 }
             ],
             model="llama-3.3-70b-versatile",
