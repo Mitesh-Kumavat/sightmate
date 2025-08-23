@@ -27,6 +27,17 @@ export default function SignupPage() {
         const formData = new FormData(e.currentTarget as HTMLFormElement)
         const { firstname, lastname, email, password } = Object.fromEntries(formData.entries())
 
+        if (typeof password !== "string" || password.length < 8) {
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password as string)) {
+                toast.error("Password must contain at least one special character.")
+                setIsLoading(false)
+                return
+            }
+            toast.error("Password must be at least 8 characters long.")
+            setIsLoading(false)
+            return
+        }
+
         try {
             const response = await axios.post(`${BACKEND_URL}/signup`, {
                 firstname,
